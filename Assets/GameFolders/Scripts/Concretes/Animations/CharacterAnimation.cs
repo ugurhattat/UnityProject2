@@ -29,5 +29,12 @@ namespace UnityProject2.Animations
 
             _animator.SetBool("isJump", isJump);
         }
+
+        public void ClimbingAnimation(bool isClimbing)
+        {
+            if (_animator.GetBool("isClimb") == isClimbing) return;
+
+            _animator.SetBool("isClimb", isClimbing);
+        }
     }
 }

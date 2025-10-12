@@ -10,8 +10,7 @@ namespace UnityProject2.Movements
         [SerializeField] float jumpForce = 350f;
 
         Rigidbody2D _rigidbody2D;
-
-        public bool IsJumpAction => _rigidbody2D.velocity != Vector2.zero; // x ve y degerleri 0'dan buyukse true don yani is jump'tir.
+        public bool IsJump => _rigidbody2D.velocity != Vector2.zero;
 
         private void Awake()
         {
