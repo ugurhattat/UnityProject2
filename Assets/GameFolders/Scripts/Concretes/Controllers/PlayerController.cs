@@ -6,6 +6,7 @@ using UnityProject2.Animations;
 using UnityProject2.Combats;
 using UnityProject2.Inputs;
 using UnityProject2.Movements;
+using UnityProject2.Uis;
 
 namespace UnityProject2.Controllers
 {
@@ -37,8 +38,23 @@ namespace UnityProject2.Controllers
             _input = new PcInput(); // kullanabilmemiz icin normal class larin instance'i(ornegini almak) alinir.ornegini almazsak null kalir ve kullanamayiz. 
             //_spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         }
+
+        private void OnEnable()
+        {
+            GameCanvas gameCanvas = FindObjectOfType<GameCanvas>();
+
+            if (gameCanvas != null)
+            {
+                _health.OnDead += gameCanvas.ShowGameOverPanel;
+                DisplayHealth displayHealth = gameCanvas.GetComponentInChildren<DisplayHealth>();
+                _health.OnHealthChanged += displayHealth.WriteHealth;
+            }
+
+        }
         private void Update()
         {
+            if (_health.IsDead) return;
+
             _horizontal = _input.Horizontal;
             _vertical = _input.Vertical;
 
@@ -69,7 +85,15 @@ namespace UnityProject2.Controllers
         {
             Damage damage = collision.collider.GetComponent<Damage>();
 
-            if (damage != null)
+            if (collision.collider.GetComponent<EnemyController>() != null &&
+                collision.contacts[0].normal.x > 0.6f ||
+                collision.contacts[0].normal.x < -0.6f)
+            {
+                damage.HitTarget(_health);
+                return;
+            }
+
+            if (damage != null && collision.collider.GetComponent<EnemyController>() == null)
             {
                 damage.HitTarget(_health);
             }
