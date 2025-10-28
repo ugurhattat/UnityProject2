@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityProject2.Animations;
 using UnityProject2.Combats;
+using UnityProject2.ExtensionMethods;
 using UnityProject2.Movements;
 
 namespace UnityProject2.Controllers
@@ -55,8 +56,7 @@ namespace UnityProject2.Controllers
         {
             Damage damage = collision.collider.GetComponent<Damage>();
 
-            if (collision.collider.GetComponent<PlayerController>() != null &&
-                collision.contacts[0].normal.y < -0.6f)
+            if (collision.HasHitPlayer() && collision.WasHitBottomSide())
             {
                 damage.HitTarget(_health);
             }

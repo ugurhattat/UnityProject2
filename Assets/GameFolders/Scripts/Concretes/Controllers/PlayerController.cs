@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityProject2.Abstracts.Inputs;
 using UnityProject2.Animations;
 using UnityProject2.Combats;
+using UnityProject2.ExtensionMethods;
 using UnityProject2.Inputs;
 using UnityProject2.Movements;
 using UnityProject2.Uis;
@@ -85,15 +86,13 @@ namespace UnityProject2.Controllers
         {
             Damage damage = collision.collider.GetComponent<Damage>();
 
-            if (collision.collider.GetComponent<EnemyController>() != null &&
-                collision.contacts[0].normal.x > 0.6f ||
-                collision.contacts[0].normal.x < -0.6f)
+            if (collision.HasHitEnemy() && collision.WasHitLeftOrRightSide())
             {
                 damage.HitTarget(_health);
                 return;
             }
 
-            if (damage != null && collision.collider.GetComponent<EnemyController>() == null)
+            if (damage != null && !collision.HasHitEnemy())
             {
                 damage.HitTarget(_health);
             }
