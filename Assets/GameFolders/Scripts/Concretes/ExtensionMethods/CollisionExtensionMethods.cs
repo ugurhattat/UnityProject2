@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityProject2.Combats;
 using UnityProject2.Controllers;
 
 namespace UnityProject2.ExtensionMethods
@@ -30,6 +31,18 @@ namespace UnityProject2.ExtensionMethods
         public static bool HasHitEnemy(this Collision2D collision)
         {
             return collision.collider.GetComponent<EnemyController>() != null;
+        }
+
+        public static Health ObjectHasHealth(this Collision2D collision)
+        {
+            Health health = collision.collider.GetComponent<Health>();
+
+            if (health != null)
+            {
+                return health;
+            }
+
+            return null;
         }
     }
 }

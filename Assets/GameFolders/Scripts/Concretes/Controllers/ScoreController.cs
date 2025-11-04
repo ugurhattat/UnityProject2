@@ -8,6 +8,9 @@ namespace UnityProject2.Controllers
     public class ScoreController : MonoBehaviour
     {
         [SerializeField] int score = 1;
+        [SerializeField] AudioClip scoreClip;
+
+        public static event System.Action<AudioClip> OnScorePlaySound;
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
@@ -16,6 +19,7 @@ namespace UnityProject2.Controllers
             if (player != null)
             {
                 GameManager.Instance.IncreaseScore(score);
+                OnScorePlaySound.Invoke(scoreClip);
                 Destroy(this.gameObject);
             }
         }

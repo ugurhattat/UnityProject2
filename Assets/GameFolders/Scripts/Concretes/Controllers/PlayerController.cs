@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,6 +14,8 @@ namespace UnityProject2.Controllers
 {
     public class PlayerController : MonoBehaviour
     {
+        [SerializeField] AudioClip deadClip;
+
         float _horizontal;
         float _vertical;
         bool _isJump;
@@ -25,6 +28,10 @@ namespace UnityProject2.Controllers
         OnGround _onGround;
         Climbing _climbing;
         Health _health;
+        Damage _damage;
+        AudioSource _audioSource;
+
+        public static event Action<AudioClip> OnPlayerDead;
         //SpriteRenderer _spriteRenderer;
 
         private void Awake()
@@ -36,6 +43,8 @@ namespace UnityProject2.Controllers
             _onGround = GetComponent<OnGround>();
             _climbing = GetComponent<Climbing>();
             _health = GetComponent<Health>();
+            _damage = GetComponent<Damage>();
+            _audioSource = GetComponent<AudioSource>();
             _input = new PcInput(); // kullanabilmemiz icin normal class larin instance'i(ornegini almak) alinir.ornegini almazsak null kalir ve kullanamayiz. 
             //_spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         }
@@ -51,6 +60,8 @@ namespace UnityProject2.Controllers
                 _health.OnHealthChanged += displayHealth.WriteHealth;
             }
 
+            _health.OnHealthChanged += PlayOnHit;
+            _health.OnDead += () => OnPlayerDead.Invoke(deadClip);
         }
         private void Update()
         {
@@ -84,18 +95,20 @@ namespace UnityProject2.Controllers
 
         private void OnCollisionEnter2D(Collision2D collision)
         {
-            Damage damage = collision.collider.GetComponent<Damage>();
+            Health health = collision.ObjectHasHealth();
 
-            if (collision.HasHitEnemy() && collision.WasHitLeftOrRightSide())
+            if (health != null && collision.WasHitTopSide())
             {
-                damage.HitTarget(_health);
-                return;
+                health.TakeHit(_damage);
+                _jump.JumpAction();
             }
+        }
 
-            if (damage != null && !collision.HasHitEnemy())
-            {
-                damage.HitTarget(_health);
-            }
+        private void PlayOnHit(int currentHealth, int maxHealth)
+        {
+            if (currentHealth == maxHealth) return;
+
+            _audioSource.Play();
         }
     }
 }

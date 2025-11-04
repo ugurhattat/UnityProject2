@@ -13,7 +13,7 @@ namespace UnityProject2.Controllers
 
             if (player != null)
             {
-                GameManager.Instance.LoadScene();
+                GameManager.Instance.LoadScene(1);
             }
         }
     }

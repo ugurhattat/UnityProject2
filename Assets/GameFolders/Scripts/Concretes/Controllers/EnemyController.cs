@@ -10,14 +10,19 @@ namespace UnityProject2.Controllers
 {
     public class EnemyController : MonoBehaviour
     {
+        [SerializeField] AudioClip deadClip;
+
         Mover _mover;
         CharacterAnimation _characterAnimation;
         Health _health;
         Flip _flip;
         OnReachedEdge _onReachedEdge;
+        Damage _damage;
 
         bool _isOnEdge;
         float _direction;
+
+        public static event System.Action<AudioClip> OnEnemyDead;
 
         private void Awake()
         {
@@ -26,12 +31,14 @@ namespace UnityProject2.Controllers
             _health = GetComponent<Health>();
             _flip = GetComponent<Flip>();
             _onReachedEdge = GetComponent<OnReachedEdge>();
+            _damage = GetComponent<Damage>();
             _direction = 1f;
         }
 
         private void OnEnable()
         {
             _health.OnDead += DeadAction;
+            _health.OnDead += () => OnEnemyDead.Invoke(deadClip);
         }
 
         private void FixedUpdate()
@@ -39,6 +46,7 @@ namespace UnityProject2.Controllers
             if (_health.IsDead) return;
 
             _mover.HorizontalMove(_direction);
+            _characterAnimation.MoveAnimation(_direction);
         }
 
         private void LateUpdate()
@@ -54,16 +62,23 @@ namespace UnityProject2.Controllers
 
         private void OnCollisionEnter2D(Collision2D collision)
         {
-            Damage damage = collision.collider.GetComponent<Damage>();
+            Health health = collision.ObjectHasHealth();
 
-            if (collision.HasHitPlayer() && collision.WasHitBottomSide())
+            if (health != null && collision.WasHitLeftOrRightSide())
             {
-                damage.HitTarget(_health);
+                health.TakeHit(_damage);
             }
         }
 
         private void DeadAction()
         {
+            StartCoroutine(DeadActionAsync());
+        }
+
+        private IEnumerator DeadActionAsync()
+        {
+            _characterAnimation.DyingAnimation();
+            yield return new WaitForSeconds(0.5f);
             Destroy(this.gameObject);
         }
     }

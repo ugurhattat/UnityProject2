@@ -11,7 +11,7 @@ namespace UnityProject2.Combats
 
         public bool IsDead => currentHealth < 1;
 
-        public event System.Action<int> OnHealthChanged;
+        public event System.Action<int, int> OnHealthChanged;
         public event System.Action OnDead;
         private void Awake()
         {
@@ -20,7 +20,7 @@ namespace UnityProject2.Combats
 
         private void Start()
         {
-            OnHealthChanged?.Invoke(maxHealth);
+            OnHealthChanged?.Invoke(currentHealth, maxHealth);
         }
 
         public void TakeHit(Damage damage)
@@ -35,7 +35,7 @@ namespace UnityProject2.Combats
             }
             else
             {
-                OnHealthChanged?.Invoke(currentHealth);
+                OnHealthChanged?.Invoke(currentHealth, maxHealth);
             }
         }
     }
